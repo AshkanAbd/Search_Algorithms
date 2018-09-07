@@ -1,10 +1,11 @@
 package ir.ashkanabd;
 
-import ir.ashkanabd.algorithms.BFS;
-import ir.ashkanabd.algorithms.DFS;
+import ir.ashkanabd.algorithms.*;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
@@ -17,13 +18,15 @@ public class Controller {
     private AnchorPane mainPane;
     private Button bfsButton;
     private Button dfsButton;
+    private Button dijkstraButton;
+    private Button floydWarshallButton;
     private Button resetButton;
+    private Label timeLabel;
     private Cell[][] map = new Cell[20][20];
     private Cell startCell, stopCell;
     private boolean start = false;
     private boolean points[] = {false, false};
-    private Thread bfsThread;
-    private Thread dfsThread;
+    private Thread algorithmThread;
 
     public void initialize() {
         windowPane.setPrefHeight(Main.windowHeight);
@@ -77,19 +80,37 @@ public class Controller {
         }
     }
 
+    private void cancelRequest() {
+        Base.stopRequest = true;
+    }
+
+    private void setTimeLabel(String text) {
+        Platform.runLater(() -> timeLabel.setText(text));
+    }
+
     private void performAlgorithm(MouseEvent event) {
-        Button src = (Button) event.getSource();
-        if (event.getEventType().equals(MouseEvent.MOUSE_CLICKED) && event.getButton().equals(MouseButton.PRIMARY)
-                && points[0] && points[1]) {
-            if (src.equals(bfsButton)) {
+        try {
+            Button src = (Button) event.getSource();
+            if (event.getEventType().equals(MouseEvent.MOUSE_CLICKED) && event.getButton().equals(MouseButton.PRIMARY)
+                    && points[0] && points[1]) {
+                cancelRequest();
                 reset();
-                bfsThread = new Thread(() -> BFS.bfs(map, startCell, stopCell));
-                bfsThread.start();
-            } else if (src.equals(dfsButton)) {
-                reset();
-                dfsThread = new Thread(() -> DFS.dfs(map, startCell, stopCell));
-                dfsThread.start();
+                Thread.sleep(100);
+                if (src.equals(bfsButton)) {
+                    algorithmThread = new Thread(() -> BFS.bfs(map, startCell, stopCell, this::setTimeLabel));
+                    algorithmThread.start();
+                } else if (src.equals(dfsButton)) {
+                    algorithmThread = new Thread(() -> DFS.dfs(map, startCell, stopCell, this::setTimeLabel));
+                    algorithmThread.start();
+                } else if (src.equals(dijkstraButton)) {
+                    algorithmThread = new Thread(() -> Dijkstra.dijkstra(map, startCell, stopCell, this::setTimeLabel));
+                    algorithmThread.start();
+                } else if (src.equals(floydWarshallButton)) {
+                    algorithmThread = new Thread(() -> FloydWarshall.floydWarshall(map, startCell, stopCell, this::setTimeLabel));
+                    algorithmThread.start();
+                }
             }
+        } catch (Exception e) {
         }
     }
 
@@ -103,15 +124,21 @@ public class Controller {
     }
 
     private void resetAll(MouseEvent event) {
-        if (event.getButton().equals(MouseButton.PRIMARY) && event.getEventType().equals(MouseEvent.MOUSE_CLICKED)) {
-            for (Cell[] cells : map) {
-                for (Cell cell : cells) {
-                    cell.reset();
+        try {
+            if (event.getButton().equals(MouseButton.PRIMARY) && event.getEventType().equals(MouseEvent.MOUSE_CLICKED)) {
+                cancelRequest();
+                Thread.sleep(10);
+                for (Cell[] cells : map) {
+                    for (Cell cell : cells) {
+                        cell.reset();
+                    }
                 }
+                start = false;
+                points[0] = false;
+                points[1] = false;
             }
-            start = false;
-            points[0] = false;
-            points[1] = false;
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 
@@ -139,29 +166,54 @@ public class Controller {
     }
 
     private void addButtons() {
+        // BFS button setup
         bfsButton = new Button("BFS algorithm");
         bfsButton.setLayoutX(Main.windowHeight + 20);
         bfsButton.setLayoutY(20);
         bfsButton.setPrefHeight(30);
         bfsButton.setPrefWidth(Main.windowWidth - (Main.windowHeight + 30));
         bfsButton.setOnMouseClicked(this::performAlgorithm);
-
+        // DFS button setup
         dfsButton = new Button("DFS algorithm");
         dfsButton.setLayoutX(Main.windowHeight + 20);
         dfsButton.setLayoutY(70);
         dfsButton.setPrefHeight(30);
         dfsButton.setPrefWidth(Main.windowWidth - (Main.windowHeight + 30));
         dfsButton.setOnMouseClicked(this::performAlgorithm);
-
+        // Dijkstra button setup
+        dijkstraButton = new Button("Dijkstra algorithm");
+        dijkstraButton.setLayoutX(Main.windowHeight + 20);
+        dijkstraButton.setLayoutY(120);
+        dijkstraButton.setPrefHeight(30);
+        dijkstraButton.setPrefWidth(Main.windowWidth - (Main.windowHeight + 30));
+        dijkstraButton.setOnMouseClicked(this::performAlgorithm);
+        // Floyd Warshall button setup
+        floydWarshallButton = new Button("Floyd-Warshall");
+        floydWarshallButton.setLayoutX(Main.windowHeight + 20);
+        floydWarshallButton.setLayoutY(170);
+        floydWarshallButton.setPrefHeight(30);
+        floydWarshallButton.setPrefWidth(Main.windowWidth - (Main.windowHeight + 30));
+        floydWarshallButton.setOnMouseClicked(this::performAlgorithm);
+        // Time label setup
+        timeLabel = new Label();
+        timeLabel.setLayoutX(Main.windowHeight + 20);
+        timeLabel.setLayoutY(Main.windowHeight - 50);
+        timeLabel.setPrefHeight(30);
+        timeLabel.setPrefWidth(Main.windowWidth - (Main.windowHeight + 30));
+        timeLabel.setStyle("-fx-alignment: center");
+        // Reset button setup
         resetButton = new Button("Reset");
         resetButton.setLayoutX(Main.windowHeight + 20);
-        resetButton.setLayoutY(Main.windowHeight - 50);
+        resetButton.setLayoutY(Main.windowHeight - 100);
         resetButton.setPrefHeight(30);
         resetButton.setPrefWidth(Main.windowWidth - (Main.windowHeight + 30));
         resetButton.setOnMouseClicked(this::resetAll);
-
+        // Add all to windowPane
         windowPane.getChildren().add(bfsButton);
         windowPane.getChildren().add(dfsButton);
+        windowPane.getChildren().add(dijkstraButton);
+        windowPane.getChildren().add(floydWarshallButton);
         windowPane.getChildren().add(resetButton);
+        windowPane.getChildren().add(timeLabel);
     }
 }

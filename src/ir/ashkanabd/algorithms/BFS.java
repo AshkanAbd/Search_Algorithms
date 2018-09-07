@@ -4,35 +4,35 @@ import ir.ashkanabd.Cell;
 
 import java.util.Set;
 import java.util.Queue;
-import java.util.Map;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Collections;
-import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 public class BFS extends Base {
 
-    public static void bfs(Cell[][] map, Cell startCell, Cell stopCell) {
-        BFS bfs = new BFS(map, startCell, stopCell);
+    public static void bfs(Cell[][] map, Cell startCell, Cell stopCell, OnEndListener onEndListener) {
+        BFS bfs = new BFS(map, startCell, stopCell, onEndListener);
         bfs.startBFS();
     }
 
-    private BFS(Cell[][] map, Cell startCell, Cell stopCell) {
-        super(map, startCell, stopCell);
+    private BFS(Cell[][] map, Cell startCell, Cell stopCell, OnEndListener onEndListener) {
+        super(map, startCell, stopCell, onEndListener);
     }
 
     private void startBFS() {
         Set<Cell> blockList = new HashSet<>();
-        Map<Cell, Cell> pathMap = new HashMap<>();
+        pathMap = new HashMap<>();
         Queue<Cell> mainQueue = new LinkedList<>();
         Cell current = startCell;
         do {
+            if (stopRequest) stop = true;
+            if (stop) return;
             blockList.add(current);
             mainQueue.poll();
-            List<Cell> neighbors = getNeighbors(current);
-            for (Cell c : neighbors) {
+            for (Cell c : getFreeNeighbors(current)) {
                 if (!blockList.contains(c) && !mainQueue.contains(c)) {
                     mainQueue.add(c);
                     pathMap.put(c, current);
@@ -40,15 +40,16 @@ public class BFS extends Base {
             }
             changeCellColor(mainQueue, "aqua");
             current = mainQueue.peek();
-            if (current.equals(stopCell)) {
+            if (current == null || current.equals(stopCell)) {
                 break;
             }
         } while (!mainQueue.isEmpty());
-        if (current.equals(stopCell)) {
-            List<Cell> path = buildPath(pathMap);
+        if (current != null && current.equals(stopCell)) {
+            List<Cell> path = buildPath();
             Collections.reverse(path);
             changeCellColor(path, "yellow");
         }
         System.out.println("End");
+        calculateTime();
     }
 }

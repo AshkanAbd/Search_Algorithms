@@ -8,21 +8,24 @@ import java.util.Map;
 import java.util.Set;
 import java.util.List;
 import java.util.Collections;
+import java.util.concurrent.TimeUnit;
 
 public class DFS extends Base {
 
-    public static void dfs(Cell[][] map, Cell startCell, Cell stopCell) {
-        DFS dfs = new DFS(map, startCell, stopCell);
+    public static void dfs(Cell[][] map, Cell startCell, Cell stopCell, OnEndListener onEndListener) {
+        DFS dfs = new DFS(map, startCell, stopCell, onEndListener);
         dfs.startDFS();
     }
 
-    private DFS(Cell[][] map, Cell startCell, Cell stopCell) {
-        super(map, startCell, stopCell);
+    private DFS(Cell[][] map, Cell startCell, Cell stopCell, OnEndListener onEndListener) {
+        super(map, startCell, stopCell, onEndListener);
     }
 
     private void DFSStack(Map<Cell, Cell> pathMap, Cell current, Set<Cell> blockSet) {
+        if (stopRequest) stop = true;
+        if (stop) return;
         blockSet.add(current);
-        for (Cell c : getNeighbors(current)) {
+        for (Cell c : getFreeNeighbors(current)) {
             if (blockSet.contains(stopCell)) {
                 return;
             }
@@ -38,19 +41,16 @@ public class DFS extends Base {
     }
 
     private void startDFS() {
-        Map<Cell, Cell> pathMap = new HashMap<>();
+        pathMap = new HashMap<>();
         Set<Cell> blockSet = new HashSet<>();
         Cell current = startCell;
         DFSStack(pathMap, current, blockSet);
         if (pathMap.containsKey(stopCell)) {
-            List<Cell> path = buildPath(pathMap);
+            List<Cell> path = buildPath();
             Collections.reverse(path);
             changeCellColor(path, "yellow");
         }
         System.out.println("End");
-    }
-
-    private void stopDFS(Map<Cell, Cell> pathMap) {
-
+        calculateTime();
     }
 }
