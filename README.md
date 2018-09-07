@@ -12,6 +12,10 @@ left click to set walls
 <b>DFS (Depth First Search)</b>
   
 <b>Dijkstra</b>
+
+<b>Best First Search</b>
+
+<b>A* </b>
   
 <b>Floyd-Warshall</b>
   
