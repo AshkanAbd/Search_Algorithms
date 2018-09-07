@@ -7,9 +7,6 @@ import java.util.Queue;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.List;
-import java.util.Collections;
-import java.util.concurrent.TimeUnit;
 
 public class BFS extends Base {
 
@@ -40,16 +37,11 @@ public class BFS extends Base {
             }
             changeCellColor(mainQueue, "aqua");
             current = mainQueue.peek();
-            if (current == null || current.equals(stopCell)) {
+            if (current == null || pathMap.containsKey(stopCell)) {
                 break;
             }
         } while (!mainQueue.isEmpty());
-        if (current != null && current.equals(stopCell)) {
-            List<Cell> path = buildPath();
-            Collections.reverse(path);
-            changeCellColor(path, "yellow");
-        }
+        showPath();
         System.out.println("End");
-        calculateTime();
     }
 }

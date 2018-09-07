@@ -4,6 +4,7 @@ import ir.ashkanabd.Cell;
 import javafx.application.Platform;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -21,6 +22,7 @@ public abstract class Base {
     protected int[][] proximityMatrix;
 
     private int colored = 0;
+    private int threadUpdate = 25;
 
     Base(Cell[][] map, Cell startCell, Cell stopCell, OnEndListener onEndListener) {
         this.startCell = startCell;
@@ -62,7 +64,7 @@ public abstract class Base {
                 if (!cell.getStyle().contains("-fx-background-color: " + color)) {
                     if (!cell.isStop() && !cell.isStart()) {
                         Platform.runLater(() -> cell.setStyle("-fx-background-color: " + color));
-                        Thread.sleep(75);
+                        Thread.sleep(threadUpdate);
                         colored++;
                     }
                 }
@@ -72,10 +74,14 @@ public abstract class Base {
         }
     }
 
-    protected void calculateTime() {
+    protected void calculateTime(String text) {
         long endTime = System.currentTimeMillis() - time;
-        endTime = endTime - (75 * colored);
-        onEndListener.onEnd("Time : " + endTime + " ms");
+        endTime = endTime - (threadUpdate * colored);
+        onEndListener.onEnd("Time : " + endTime + " ms\nlength = " + text);
+    }
+
+    protected int heuristic(Cell cell) {
+        return Math.abs(cell.getX() - stopCell.getX()) + Math.abs(cell.getY() - stopCell.getY());
     }
 
     protected Cell getUp(Cell cell) throws Exception {
@@ -121,6 +127,17 @@ public abstract class Base {
             if (!c.isWall())
                 neighbors.add(c);
         return neighbors;
+    }
+
+    protected void showPath(){
+        if (pathMap.containsKey(stopCell)) {
+            List<Cell> path = buildPath();
+            Collections.reverse(path);
+            changeCellColor(path, "yellow");
+            calculateTime(path.size() + "");
+        }else{
+            calculateTime("0");
+        }
     }
 
     protected List<Cell> buildPath() {

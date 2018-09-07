@@ -20,6 +20,8 @@ public class Controller {
     private Button dfsButton;
     private Button dijkstraButton;
     private Button floydWarshallButton;
+    private Button bestFirstButton;
+    private Button aStarButton;
     private Button resetButton;
     private Label timeLabel;
     private Cell[][] map = new Cell[20][20];
@@ -48,7 +50,7 @@ public class Controller {
                 src.setStyle("-fx-background-color: snow");
                 src.setWall(false);
             } else {
-                src.setStyle("-fx-background-color: deepskyblue");
+                src.setStyle("-fx-background-color: dodgerblue");
                 src.setWall(true);
             }
         }
@@ -107,6 +109,12 @@ public class Controller {
                     algorithmThread.start();
                 } else if (src.equals(floydWarshallButton)) {
                     algorithmThread = new Thread(() -> FloydWarshall.floydWarshall(map, startCell, stopCell, this::setTimeLabel));
+                    algorithmThread.start();
+                } else if (src.equals(bestFirstButton)) {
+                    algorithmThread = new Thread(() -> BestFirstSearch.bestFirstSearch(map, startCell, stopCell, this::setTimeLabel));
+                    algorithmThread.start();
+                } else if (src.equals(aStarButton)) {
+                    algorithmThread = new Thread(() -> AStar.aStar(map, startCell, stopCell, this::setTimeLabel));
                     algorithmThread.start();
                 }
             }
@@ -187,10 +195,24 @@ public class Controller {
         dijkstraButton.setPrefHeight(30);
         dijkstraButton.setPrefWidth(Main.windowWidth - (Main.windowHeight + 30));
         dijkstraButton.setOnMouseClicked(this::performAlgorithm);
+        // Best First button setup
+        bestFirstButton = new Button("Best First algorithm");
+        bestFirstButton.setLayoutX(Main.windowHeight + 20);
+        bestFirstButton.setLayoutY(170);
+        bestFirstButton.setPrefHeight(30);
+        bestFirstButton.setPrefWidth(Main.windowWidth - (Main.windowHeight + 30));
+        bestFirstButton.setOnMouseClicked(this::performAlgorithm);
+        // A Start button setup
+        aStarButton = new Button("A* algorithm");
+        aStarButton.setLayoutX(Main.windowHeight + 20);
+        aStarButton.setLayoutY(220);
+        aStarButton.setPrefHeight(30);
+        aStarButton.setPrefWidth(Main.windowWidth - (Main.windowHeight + 30));
+        aStarButton.setOnMouseClicked(this::performAlgorithm);
         // Floyd Warshall button setup
         floydWarshallButton = new Button("Floyd-Warshall");
         floydWarshallButton.setLayoutX(Main.windowHeight + 20);
-        floydWarshallButton.setLayoutY(170);
+        floydWarshallButton.setLayoutY(270);
         floydWarshallButton.setPrefHeight(30);
         floydWarshallButton.setPrefWidth(Main.windowWidth - (Main.windowHeight + 30));
         floydWarshallButton.setOnMouseClicked(this::performAlgorithm);
@@ -198,7 +220,7 @@ public class Controller {
         timeLabel = new Label();
         timeLabel.setLayoutX(Main.windowHeight + 20);
         timeLabel.setLayoutY(Main.windowHeight - 50);
-        timeLabel.setPrefHeight(30);
+        timeLabel.setPrefHeight(40);
         timeLabel.setPrefWidth(Main.windowWidth - (Main.windowHeight + 30));
         timeLabel.setStyle("-fx-alignment: center");
         // Reset button setup
@@ -212,6 +234,8 @@ public class Controller {
         windowPane.getChildren().add(bfsButton);
         windowPane.getChildren().add(dfsButton);
         windowPane.getChildren().add(dijkstraButton);
+        windowPane.getChildren().add(bestFirstButton);
+        windowPane.getChildren().add(aStarButton);
         windowPane.getChildren().add(floydWarshallButton);
         windowPane.getChildren().add(resetButton);
         windowPane.getChildren().add(timeLabel);

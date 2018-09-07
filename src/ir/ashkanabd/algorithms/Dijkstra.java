@@ -3,7 +3,6 @@ package ir.ashkanabd.algorithms;
 import ir.ashkanabd.Cell;
 
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 public class Dijkstra extends Base {
 
@@ -46,16 +45,11 @@ public class Dijkstra extends Base {
             mainQueue.sort(Comparator.comparingInt(Pair::getB));
             changeCellColor(dMap.keySet(), "aqua");
             current = mainQueue.peekFirst().getA();
-            if (current == null || current.equals(stopCell)) {
+            if (current == null || pathMap.containsKey(stopCell)) {
                 break;
             }
         } while (!mainQueue.isEmpty());
-        if (current != null && current.equals(stopCell)) {
-            List<Cell> path = buildPath();
-            Collections.reverse(path);
-            changeCellColor(path, "yellow");
-        }
+        showPath();
         System.out.println("End");
-        calculateTime();
     }
 }

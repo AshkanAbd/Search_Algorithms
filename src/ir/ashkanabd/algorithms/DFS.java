@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.List;
 import java.util.Collections;
-import java.util.concurrent.TimeUnit;
 
 public class DFS extends Base {
 
@@ -26,13 +25,13 @@ public class DFS extends Base {
         if (stop) return;
         blockSet.add(current);
         for (Cell c : getFreeNeighbors(current)) {
-            if (blockSet.contains(stopCell)) {
+            if (pathMap.containsKey(stopCell)) {
                 return;
             }
             if (!blockSet.contains(c)) {
                 pathMap.put(c, current);
                 changeCellColor(Collections.singletonList(c), "aqua");
-                if (blockSet.contains(stopCell)) {
+                if (pathMap.containsKey(stopCell)) {
                     return;
                 }
                 DFSStack(pathMap, c, blockSet);
@@ -45,12 +44,7 @@ public class DFS extends Base {
         Set<Cell> blockSet = new HashSet<>();
         Cell current = startCell;
         DFSStack(pathMap, current, blockSet);
-        if (pathMap.containsKey(stopCell)) {
-            List<Cell> path = buildPath();
-            Collections.reverse(path);
-            changeCellColor(path, "yellow");
-        }
+        showPath();
         System.out.println("End");
-        calculateTime();
     }
 }

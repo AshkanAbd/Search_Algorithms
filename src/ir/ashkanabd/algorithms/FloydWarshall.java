@@ -46,9 +46,11 @@ public class FloydWarshall extends Base {
             iList.addAll(indexPath);
             List<Cell> cellPath = getCellFromIndex(iList);
             changeCellColor(cellPath, "yellow");
+            calculateTime(iList.size() + "");
+        }else{
+            calculateTime("0");
         }
         System.out.println("End");
-        calculateTime();
     }
 
     private void buildFloydPath(Set<Integer> indexPath, int[][] path, int f, int s) {
