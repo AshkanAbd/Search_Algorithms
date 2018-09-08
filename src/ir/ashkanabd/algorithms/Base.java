@@ -3,10 +3,7 @@ package ir.ashkanabd.algorithms;
 import ir.ashkanabd.Cell;
 import javafx.application.Platform;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public abstract class Base {
 
@@ -19,7 +16,8 @@ public abstract class Base {
     protected Cell[][] map;
     protected Map<Cell, Cell> pathMap;
     protected Cell startCell, stopCell;
-    protected int[][] proximityMatrix;
+    protected int[][] adjacencyMatrix;
+    protected ArrayList<Integer>[] adjacencyList;
 
     private int colored = 0;
     private int threadUpdate = 25;
@@ -33,13 +31,13 @@ public abstract class Base {
         time = System.currentTimeMillis();
     }
 
-    protected void buildProximityMatrix() {
-        proximityMatrix = new int[400][400];
+    protected void buildAdjacencyMatrix() {
+        adjacencyMatrix = new int[400][400];
         for (int i = 0; i < 400; i++) {
             for (int j = 0; j < 400; j++) {
-                proximityMatrix[i][j] = MAX;
+                adjacencyMatrix[i][j] = MAX;
                 if (i == j) {
-                    proximityMatrix[i][j] = 0;
+                    adjacencyMatrix[i][j] = 0;
                 }
             }
         }
@@ -48,8 +46,27 @@ public abstract class Base {
                 Cell c = map[i][j];
                 for (Cell cell : getNeighbors(c)) {
                     if (!c.isWall() && !cell.isWall()) {
-                        proximityMatrix[cell.getX() * 20 + cell.getY()][c.getX() * 20 + c.getY()] = 1;
-                        proximityMatrix[c.getX() * 20 + c.getY()][cell.getX() * 20 + cell.getY()] = 1;
+                        adjacencyMatrix[cell.getX() * 20 + cell.getY()][c.getX() * 20 + c.getY()] = 1;
+                        adjacencyMatrix[c.getX() * 20 + c.getY()][cell.getX() * 20 + cell.getY()] = 1;
+                    }
+                }
+            }
+        }
+    }
+
+    protected void buildAdjacencyList() {
+        adjacencyList = new ArrayList[400];
+        for (int i = 0; i < 400; i++) {
+            adjacencyList[i] = new ArrayList<>();
+        }
+        ArrayList<Integer> myList;
+        for (int i = 0; i < 20; i++) {
+            for (int j = 0; j < 20; j++) {
+                Cell c = map[i][j];
+                myList = adjacencyList[c.getX() * 20 + c.getY()];
+                for (Cell cell : getNeighbors(c)) {
+                    if (!c.isWall() && !cell.isWall()) {
+                        myList.add(cell.getX() * 20 + cell.getY());
                     }
                 }
             }
@@ -129,13 +146,13 @@ public abstract class Base {
         return neighbors;
     }
 
-    protected void showPath(){
+    protected void showPath() {
         if (pathMap.containsKey(stopCell)) {
             List<Cell> path = buildPath();
             Collections.reverse(path);
             changeCellColor(path, "yellow");
             calculateTime(path.size() + "");
-        }else{
+        } else {
             calculateTime("0");
         }
     }

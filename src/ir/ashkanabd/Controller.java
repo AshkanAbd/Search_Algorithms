@@ -9,6 +9,7 @@ import javafx.scene.control.Label;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.text.Font;
 
 public class Controller {
 
@@ -19,9 +20,10 @@ public class Controller {
     private Button bfsButton;
     private Button dfsButton;
     private Button dijkstraButton;
-    private Button floydWarshallButton;
     private Button bestFirstButton;
     private Button aStarButton;
+    private Button bellmanFordButton;
+    private Button floydWarshallButton;
     private Button resetButton;
     private Label timeLabel;
     private Cell[][] map = new Cell[20][20];
@@ -116,6 +118,9 @@ public class Controller {
                 } else if (src.equals(aStarButton)) {
                     algorithmThread = new Thread(() -> AStar.aStar(map, startCell, stopCell, this::setTimeLabel));
                     algorithmThread.start();
+                } else if (src.equals(bellmanFordButton)) {
+                    algorithmThread = new Thread(() -> BellmanFord.bellmanFord(map, startCell, stopCell, this::setTimeLabel));
+                    algorithmThread.start();
                 }
             }
         } catch (Exception e) {
@@ -209,33 +214,42 @@ public class Controller {
         aStarButton.setPrefHeight(30);
         aStarButton.setPrefWidth(Main.windowWidth - (Main.windowHeight + 30));
         aStarButton.setOnMouseClicked(this::performAlgorithm);
+        // Bellman Ford button setup
+        bellmanFordButton = new Button("Bellman-Ford");
+        bellmanFordButton.setLayoutX(Main.windowHeight + 20);
+        bellmanFordButton.setLayoutY(270);
+        bellmanFordButton.setPrefHeight(30);
+        bellmanFordButton.setPrefWidth(Main.windowWidth - (Main.windowHeight + 30));
+        bellmanFordButton.setOnMouseClicked(this::performAlgorithm);
         // Floyd Warshall button setup
         floydWarshallButton = new Button("Floyd-Warshall");
         floydWarshallButton.setLayoutX(Main.windowHeight + 20);
-        floydWarshallButton.setLayoutY(270);
+        floydWarshallButton.setLayoutY(320);
         floydWarshallButton.setPrefHeight(30);
         floydWarshallButton.setPrefWidth(Main.windowWidth - (Main.windowHeight + 30));
         floydWarshallButton.setOnMouseClicked(this::performAlgorithm);
-        // Time label setup
-        timeLabel = new Label();
-        timeLabel.setLayoutX(Main.windowHeight + 20);
-        timeLabel.setLayoutY(Main.windowHeight - 50);
-        timeLabel.setPrefHeight(40);
-        timeLabel.setPrefWidth(Main.windowWidth - (Main.windowHeight + 30));
-        timeLabel.setStyle("-fx-alignment: center");
         // Reset button setup
         resetButton = new Button("Reset");
         resetButton.setLayoutX(Main.windowHeight + 20);
-        resetButton.setLayoutY(Main.windowHeight - 100);
+        resetButton.setLayoutY(370);
         resetButton.setPrefHeight(30);
         resetButton.setPrefWidth(Main.windowWidth - (Main.windowHeight + 30));
         resetButton.setOnMouseClicked(this::resetAll);
+        // Time label setup
+        timeLabel = new Label();
+        timeLabel.setLayoutX(Main.windowHeight + 20);
+        timeLabel.setLayoutY(420);
+        timeLabel.setPrefHeight(40);
+        timeLabel.setPrefWidth(Main.windowWidth - (Main.windowHeight + 30));
+        timeLabel.setFont(Font.font(15));
+        timeLabel.setStyle("-fx-alignment: center; -fx-font-family: sans-serif;");
         // Add all to windowPane
         windowPane.getChildren().add(bfsButton);
         windowPane.getChildren().add(dfsButton);
         windowPane.getChildren().add(dijkstraButton);
         windowPane.getChildren().add(bestFirstButton);
         windowPane.getChildren().add(aStarButton);
+        windowPane.getChildren().add(bellmanFordButton);
         windowPane.getChildren().add(floydWarshallButton);
         windowPane.getChildren().add(resetButton);
         windowPane.getChildren().add(timeLabel);

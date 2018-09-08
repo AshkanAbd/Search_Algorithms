@@ -3,8 +3,6 @@ package ir.ashkanabd.algorithms;
 import ir.ashkanabd.Cell;
 
 import java.util.Set;
-import java.util.List;
-import java.util.ArrayList;
 import java.util.HashSet;
 
 public class FloydWarshall extends Base {
@@ -19,8 +17,8 @@ public class FloydWarshall extends Base {
     }
 
     private void startFloydWarshall() {
-        buildProximityMatrix();
-        int D[][] = proximityMatrix.clone();
+        buildAdjacencyMatrix();
+        int D[][] = adjacencyMatrix.clone();
         int path[][] = new int[400][400];
         for (int i = 0; i < 400; i++) {
             for (int j = 0; j < 400; j++) {
@@ -39,33 +37,22 @@ public class FloydWarshall extends Base {
         }
         int startPoint = startCell.getX() * 20 + startCell.getY();
         int stopPoint = stopCell.getX() * 20 + stopCell.getY();
-        Set<Integer> indexPath = new HashSet<>();
-        buildFloydPath(indexPath, path, startPoint, stopPoint);
-        if (!indexPath.isEmpty()) {
-            List<Integer> iList = new ArrayList<>();
-            iList.addAll(indexPath);
-            List<Cell> cellPath = getCellFromIndex(iList);
+        Set<Cell> cellPath = new HashSet<>();
+        buildFloydWarshallPath(cellPath, path, startPoint, stopPoint);
+        if (!cellPath.isEmpty()) {
             changeCellColor(cellPath, "yellow");
-            calculateTime(iList.size() + "");
+            calculateTime(cellPath.size() + "");
         }else{
             calculateTime("0");
         }
         System.out.println("End");
     }
 
-    private void buildFloydPath(Set<Integer> indexPath, int[][] path, int f, int s) {
+    private void buildFloydWarshallPath(Set<Cell> indexPath, int[][] path, int f, int s) {
         int k = path[f][s];
         if (k == -1) return;
-        indexPath.add(k);
-        buildFloydPath(indexPath, path, f, k);
-        buildFloydPath(indexPath, path, k, s);
-    }
-
-    private List<Cell> getCellFromIndex(List<Integer> path) {
-        List<Cell> cellPath = new ArrayList<>();
-        for (Integer i : path) {
-            cellPath.add(map[i / 20][i % 20]);
-        }
-        return cellPath;
+        indexPath.add(map[k / 20][k % 20]);
+        buildFloydWarshallPath(indexPath, path, f, k);
+        buildFloydWarshallPath(indexPath, path, k, s);
     }
 }
