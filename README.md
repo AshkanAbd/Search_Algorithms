@@ -16,6 +16,8 @@ left click to set walls
 <b>Best First Search</b>
 
 <b>A* </b>
-  
+
+<b>Bellman-Ford
+
 <b>Floyd-Warshall</b>
   
