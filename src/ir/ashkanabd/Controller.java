@@ -16,6 +16,9 @@ public class Controller {
     @FXML
     AnchorPane windowPane;
 
+    private static boolean mark = false;
+    private static boolean unMark = false;
+
     private AnchorPane mainPane;
     private Button bfsButton;
     private Button dfsButton;
@@ -35,6 +38,7 @@ public class Controller {
     public void initialize() {
         windowPane.setPrefHeight(Main.windowHeight);
         windowPane.setPrefWidth(Main.windowWidth);
+        windowPane.addEventHandler(MouseEvent.ANY, this::dragging);
         mainPane = new AnchorPane();
         windowPane.getChildren().add(mainPane);
         mainPane.setPrefHeight(Main.windowHeight + 1);
@@ -44,18 +48,48 @@ public class Controller {
         addButtons();
     }
 
-    private void clickListener(MouseEvent event) {
-        Cell src = (Cell) event.getSource();
-        if (event.getButton().equals(MouseButton.PRIMARY) && event.getEventType().equals(MouseEvent.MOUSE_CLICKED)
-                && !src.isStop() && !src.isStart()) {
-            if (src.isWall()) {
-                src.setStyle("-fx-background-color: snow");
-                src.setWall(false);
-            } else {
-                src.setStyle("-fx-background-color: dodgerblue");
-                src.setWall(true);
+    private void dragging(MouseEvent event) {
+        if (event.getTarget() instanceof Cell) {
+            Cell src = (Cell) event.getTarget();
+            if (event.getButton().equals(MouseButton.PRIMARY) && event.getEventType().equals(MouseEvent.MOUSE_PRESSED)) {
+                if (src.isWall()) {
+                    if (!src.isStop() && !src.isStart()) {
+                        unMark = true;
+                        src.setWall(false);
+                        src.setStyle("-fx-background-color: snow");
+                    }
+                } else {
+                    if (!src.isStop() && !src.isStart()) {
+                        mark = true;
+                        src.setWall(true);
+                        src.setStyle("-fx-background-color: dodgerblue");
+                    }
+                }
+            }
+            if (event.getButton().equals(MouseButton.PRIMARY) && event.getEventType().equals(MouseEvent.MOUSE_DRAGGED)) {
+                src = (Cell) event.getPickResult().getIntersectedNode();
+                if (unMark) {
+                    if (!src.isStop() && !src.isStart()) {
+                        src.setWall(false);
+                        src.setStyle("-fx-background-color: snow");
+                    }
+                }
+                if (mark) {
+                    if (!src.isStop() && !src.isStart()) {
+                        src.setWall(true);
+                        src.setStyle("-fx-background-color: dodgerblue");
+                    }
+                }
+            }
+            if (event.getButton().equals(MouseButton.PRIMARY) && event.getEventType().equals(MouseEvent.MOUSE_RELEASED)) {
+                if (unMark) unMark = false;
+                if (mark) mark = false;
             }
         }
+    }
+
+    private void clickListener(MouseEvent event) {
+        Cell src = (Cell) event.getSource();
         if (event.getButton().equals(MouseButton.SECONDARY) && event.getEventType().equals(MouseEvent.MOUSE_CLICKED)
                 && !src.isWall()) {
             if (src.isStart()) {
@@ -123,7 +157,7 @@ public class Controller {
                     algorithmThread.start();
                 }
             }
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
     }
 
