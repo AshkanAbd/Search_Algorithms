@@ -4,7 +4,7 @@ implementation of search algorithms
 
 right click to set start and stop points
 
-left click to set walls
+left click and drag to set walls
 
 # Implemented algorithms :
 <b>BFS (Breath First Search) </b>
