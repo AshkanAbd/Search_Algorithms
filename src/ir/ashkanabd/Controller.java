@@ -67,17 +67,19 @@ public class Controller {
                 }
             }
             if (event.getButton().equals(MouseButton.PRIMARY) && event.getEventType().equals(MouseEvent.MOUSE_DRAGGED)) {
-                src = (Cell) event.getPickResult().getIntersectedNode();
-                if (unMark) {
-                    if (!src.isStop() && !src.isStart()) {
-                        src.setWall(false);
-                        src.setStyle("-fx-background-color: snow");
+                if (event.getPickResult().getIntersectedNode() instanceof Cell) {
+                    src = (Cell) event.getPickResult().getIntersectedNode();
+                    if (unMark) {
+                        if (!src.isStop() && !src.isStart()) {
+                            src.setWall(false);
+                            src.setStyle("-fx-background-color: snow");
+                        }
                     }
-                }
-                if (mark) {
-                    if (!src.isStop() && !src.isStart()) {
-                        src.setWall(true);
-                        src.setStyle("-fx-background-color: dodgerblue");
+                    if (mark) {
+                        if (!src.isStop() && !src.isStart()) {
+                            src.setWall(true);
+                            src.setStyle("-fx-background-color: dodgerblue");
+                        }
                     }
                 }
             }
